@@ -1,3 +1,6 @@
-export const app = (a: number, b: number): number => a + b
+import * as Koa from 'koa'
+import { router as indexRouter } from './routes/index'
 
-export const f = (a: number): string => a> 7 ? `${a}` : 'not'
+export const app = new Koa()
+
+app.use(indexRouter.routes())
