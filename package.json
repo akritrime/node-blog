@@ -1,0 +1,26 @@
+{
+  "name": "node_blog",
+  "version": "0.0.1",
+  "description": "A blogging api written with Koa.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "blog",
+    "koa",
+    "node_blog",
+    "tdd"
+  ],
+  "author": "akritrime",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^22.1.1",
+    "@types/supertest": "^2.0.4",
+    "jest": "^22.1.4",
+    "supertest": "^3.0.0",
+    "ts-jest": "^22.0.3",
+    "typescript": "^2.7.1"
+  }
+}
