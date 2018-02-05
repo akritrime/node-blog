@@ -1,43 +1,43 @@
-// Update with your config settings.
+const { join } = require('path')
+const BASE_PATH = join(__dirname, 'src', 'db')
 
 module.exports = {
 
+  test: {
+    client: 'pg',
+    connection: {
+      database: 'api_test',
+      user:     'postgres',
+      password: 'secret_password'
+    },
+    pool: {
+      min: 2,
+      max: 10
+    },
+    migrations: {
+      tableName: join(BASE_PATH, 'test', 'knex_migrations')
+    },
+    seeds: {
+      tableName: join(BASE_PATH, 'test', 'knex_seeds')
+    }
+  },
+
   development: {
-    client: 'sqlite3',
+    client: 'pg',
     connection: {
-      filename: './dev.sqlite3'
-    }
-  },
-
-  staging: {
-    client: 'postgresql',
-    connection: {
-      database: 'my_db',
-      user:     'username',
-      password: 'password'
+      database: 'api',
+      user:     'postgres',
+      password: 'secret_password'
     },
     pool: {
       min: 2,
       max: 10
     },
     migrations: {
-      tableName: 'knex_migrations'
-    }
-  },
-
-  production: {
-    client: 'postgresql',
-    connection: {
-      database: 'my_db',
-      user:     'username',
-      password: 'password'
+      tableName: join(BASE_PATH, 'development', 'knex_migrations')
     },
-    pool: {
-      min: 2,
-      max: 10
-    },
-    migrations: {
-      tableName: 'knex_migrations'
+    seeds: {
+      tableName: join(BASE_PATH, 'development', 'knex_seeds')
     }
   }
 
