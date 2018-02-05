@@ -15,10 +15,12 @@ module.exports = {
       max: 10
     },
     migrations: {
-      tableName: join(BASE_PATH, 'test', 'knex_migrations')
+      directory: join(BASE_PATH, 'knex_migrations'),
+      tableName: "knex_migartions"
     },
     seeds: {
-      tableName: join(BASE_PATH, 'test', 'knex_seeds')
+      directory: join(BASE_PATH, 'test', 'knex_seeds'),
+      tableName: "knex_seeds"
     }
   },
 
@@ -34,10 +36,12 @@ module.exports = {
       max: 10
     },
     migrations: {
-      tableName: join(BASE_PATH, 'development', 'knex_migrations')
+      directory: join(BASE_PATH, 'knex_migrations'),
+      tableName: "knex_migartions"
     },
     seeds: {
-      tableName: join(BASE_PATH, 'development', 'knex_seeds')
+      directory: join(BASE_PATH, 'development', 'knex_seeds'),
+      tableName: "knex_seeds"
     }
   }
 
