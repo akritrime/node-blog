@@ -1,6 +1,6 @@
 import { dbConf } from "./index";
 
-export const withDB = (Model) => (description, tests) => {
+export const withDB = (Model) => (description: string, tests: jest.EmptyFunction) => {
     describe(description, () => {
         const { setUp, tearDown, knexInit, knexDestroy } = dbConf(Model)
         
@@ -26,6 +26,6 @@ export const returnsJSON = (req, opts = {}) => (description, tests) => describe(
         expect(res.status).toBe(check.status)
         expect(res.body).toBeInstanceOf(Object)
     })
-    
+
     tests()
 })

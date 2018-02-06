@@ -27,11 +27,10 @@ export const getOne: IMiddleware = async (ctx, next) => {
             , data: post
         }
     } catch (err) {
-        // console.error(err)
         ctx.status = err.status || 500
         ctx.body = {
             status: "error"
-            , data: err.message || "Error querying for posts"
+            , data: err.message || "Error querying for post"
         }
     }
 } 

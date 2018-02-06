@@ -8,13 +8,11 @@ export const knex = Knex(knexConf.test)
 
 export const req = request(app.callback())
 
-// export const returnsJSON = (res, opts = {}) => {
-    
-// }
-
 export const dbConf = (Model) => {
     const knexInit = () => Model.knex(knex)
+
     const knexDestroy = () => Model.knex().destroy()
+    
     const setUp = async () => {
         await Model.knex()
             .migrate
