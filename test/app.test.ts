@@ -1,4 +1,5 @@
-import { req, returnsJSON, dbConf } from './utils'
+import { req, returnsJSON } from './utils'
+import { withDB } from './utils/commonTestPatterns'
 import { Model } from 'objection'
 
 
@@ -16,13 +17,14 @@ describe("routes : index.", () => {
     })
 })
 
-describe("routes : posts", () => {
-    const { setUp, tearDown, knexInit, knexDestroy } = dbConf(Model)
+withDB(Model)("routes : posts", () => {
+    // const { setUp, tearDown, knexInit, knexDestroy } = dbConf(Model)
     
-    beforeAll(knexInit)
-    beforeEach(setUp)
-    afterEach(tearDown)
-    afterAll(knexDestroy)
+    // beforeAll(knexInit)
+    // beforeEach(setUp)
+
+    // afterEach(tearDown)
+    // afterAll(knexDestroy)
 
     describe("GET /posts", () => {
         test("returns all the posts.", async () => {

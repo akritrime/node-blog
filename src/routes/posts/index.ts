@@ -1,5 +1,5 @@
 import * as Router from 'koa-router'
-import { get } from './_middlewares'
+import { getAll } from './_middlewares'
 export const router = new Router()
 
-router.get("/posts", get)
+router.get("/posts", getAll)

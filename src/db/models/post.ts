@@ -2,9 +2,9 @@ import { Model } from 'objection'
 
 export class Post extends Model {
 
-    // id: number
-    // title: string
-    // content: string
+    id?: number
+    title?: string
+    content?: string
 
     static tableName  = "posts"
     static jsonSchema = {
@@ -20,4 +20,5 @@ export class Post extends Model {
             , content: { type: 'string' }
         }
     }
+    
 } 
