@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
         //     .references("id")
         //     .inTable("users")
         table.text("content")
-        table.timestamps()
+        table.timestamps(true, true)
   })
 };
 

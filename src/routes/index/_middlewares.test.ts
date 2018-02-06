@@ -1,4 +1,4 @@
-import { get } from './_handler'
+import { get } from './_middlewares'
 
 describe("middlewares : index", () => {
     test("get responds with a JSON", async () => {
