@@ -1,5 +1,5 @@
 import { get } from './_middlewares'
-import { knex, dbConf } from '../../../test/utils'
+import { dbConf } from '../../../test/utils'
 import { Model } from 'objection'
 import { Post } from '../../db/models/post'
 
@@ -11,6 +11,7 @@ describe("middlewares : posts", () => {
             const ctx: any = {}
             await get(ctx, async () => {})
             expect(ctx.status).not.toBe(200)
+            // console.log(ctx)
             expect(ctx.body.status).toBe("error")
             // expect(ctx.body.data).toBeInstanceOf(String)
             // console.log(JSON.stringify(ctx.body))
@@ -19,11 +20,13 @@ describe("middlewares : posts", () => {
     })
 
     describe("with proper db initialization", () => {
-        Model.knex(knex)
-        const { setUp, tearDown } = dbConf(Model)
+        const { setUp, tearDown, knexInit, knexDestroy } = dbConf(Model)
         
+        beforeAll(knexInit)
         beforeEach(setUp)
+        
         afterEach(tearDown)
+        afterAll(knexDestroy)
         
         test("get responds with a JSON", async () => {
             const ctx: any = {}

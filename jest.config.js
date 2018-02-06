@@ -1,9 +1,10 @@
 module.exports = {
-    // "collectCoverage": true,
-    // "collectCoverageFrom": [
-    //     "**/src/**",
-    //     "**/node_modules/**"
-    // ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+        "**/src/**",
+        // "**/node_modules/**"
+    ],
+    "verbose": true,
     "testEnvironment": "node",
     "moduleFileExtensions": [
         "js",
@@ -16,5 +17,5 @@ module.exports = {
     },
     "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(js|ts)$",
     "modulePathIgnorePatterns": ["test/utils", "db/test", "dist/"],
-    // "coveragePathIgnorePatterns": ["knex_migrations/","knex_seeds/", "src/server.ts"]
+    "coveragePathIgnorePatterns": ["knex_migrations/","knex_seeds/", "src/server.ts"]
 }

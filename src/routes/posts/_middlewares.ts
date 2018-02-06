@@ -13,7 +13,7 @@ export const get: IMiddleware = async (ctx, next) => {
         ctx.status = err.status || 500
         ctx.body = {
             status: "error"
-            , data: err.message || "Err querying for posts"
+            , data: err.message || "Error querying for posts"
         }
     }
 }

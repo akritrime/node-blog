@@ -1,4 +1,4 @@
-import { req, returnsJSON, knex, dbConf } from './utils'
+import { req, returnsJSON, dbConf } from './utils'
 import { Model } from 'objection'
 
 
@@ -17,11 +17,12 @@ describe("routes : index.", () => {
 })
 
 describe("routes : posts", () => {
-    Model.knex(knex)
-    const { setUp, tearDown } = dbConf(Model)
-
+    const { setUp, tearDown, knexInit, knexDestroy } = dbConf(Model)
+    
+    beforeAll(knexInit)
     beforeEach(setUp)
     afterEach(tearDown)
+    afterAll(knexDestroy)
 
     describe("GET /posts", () => {
         test("returns all the posts.", async () => {

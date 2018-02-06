@@ -20,6 +20,8 @@ export const returnsJSON = (res, opts = {}) => {
 }
 
 export const dbConf = (Model) => {
+    const knexInit = () => Model.knex(knex)
+    const knexDestroy = () => Model.knex().destroy()
     const setUp = async () => {
         await Model.knex()
             .migrate
@@ -41,5 +43,7 @@ export const dbConf = (Model) => {
     return {
         setUp
         , tearDown
+        , knexInit
+        , knexDestroy
     }
 }
