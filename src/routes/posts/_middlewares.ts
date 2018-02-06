@@ -27,4 +27,12 @@ export const getOne: IMiddleware = async (ctx, next) => {
         // console.error(err)
         error(ctx, err, "Error querying for post")
     }
-} 
+}
+
+export const post: IMiddleware = async (ctx, next) => {
+    try {
+        
+    } catch (err) {
+        
+    }
+}
