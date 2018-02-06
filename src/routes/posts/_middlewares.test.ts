@@ -20,7 +20,24 @@ describe("middlewares : posts", () => {
         })
     
         withDB(Model, () => {
-            respondsWith("specific post", getOne,  () => Post.query().where("id", 1))
+            respondsWith("specific post", getOne,  () => Post.query().where("id", 1).then(arr => arr[0]))
+
+            describe("on requesting with an unabsent id", () => {
+                test("returns error", async () => {
+                    const ctx = {
+                        ...getCtx(),
+                        params: {
+                            id: 23
+                        }
+                    }
+                    await getOne(ctx, async () => {})
+                    expect(ctx.status).toBe(404)
+                    expect(ctx.body).toEqual({
+                        status: "error",
+                        data: "Post with id 23 doesn't exist."
+                    })
+                })
+            })
         })
     })
 })

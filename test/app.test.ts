@@ -22,12 +22,21 @@ describe("routes : index.", () => {
 
 withDB(Model)("routes : posts", () => {
 
-    describe("GET /posts", () => {
-        test("returns all the posts.", async () => {
+    returnsJSON(req, "/posts")("GET /posts", () => {
+        test("returns all the posts", async () => {
             const res = await req.get("/posts")
-            returnsJSON(res)
             expect(res.body.status).toBe("success")
             expect(res.body.data.length).toBe(3)
+        })
+    })
+
+    returnsJSON(req, "/posts/1")("GET /posts/:id", () => {
+        test("returns a specific post", async () => {
+            const res = await req.get("/posts/1")
+            expect(res.body.status).toBe("success")
+            expect(res.body.data).toHaveProperty("id")
+            expect(res.body.data).toHaveProperty("title")
+            expect(res.body.data).toHaveProperty("content")
         })
     })
 })

@@ -1,4 +1,4 @@
-import { IMiddleware } from "koa-router"
+import { IMiddleware, IRouterContext } from "koa-router"
 import { withDB as withDBPattern } from './commonTestPatterns'
 
 export const getCtx = (): any => ({

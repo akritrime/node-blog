@@ -14,9 +14,9 @@ export const withDB = (Model) => (description: string, tests: jest.EmptyFunction
     })
 }
 
-export const returnsJSON = (req, opts = {}) => (description, tests) => describe(description, () => {
+export const returnsJSON = (req, path = "/", opts = {}) => (description, tests) => describe(description, () => {
     test("returns JSON.", async () => {
-        const res = await req.get("/")
+        const res = await req.get(path)
         const check = {
             type: "application/json",
             status: 200,
