@@ -1,5 +1,5 @@
-import { req, returnsJSON } from './utils'
-import { withDB } from './utils/commonTestPatterns'
+import { req } from './utils'
+import { withDB, returnsJSON } from './utils/commonTestPatterns'
 import { Model } from 'objection'
 
 
@@ -7,24 +7,20 @@ process.env.NODE_ENV = "test"
 
 describe("routes : index.", () => {
     
-    describe("GET /", () => {
+    returnsJSON(req)("GET /", () => {
         
-        test("Returns a JSON.", async () => {
+        test("Returns Hello, World.", async () => {
             const res = await req.get("/")
-            returnsJSON(res)
+            expect(res.body).toEqual({
+                status: "success"
+                , message: "Hello, World!"
+            })
         })
         
     })
 })
 
 withDB(Model)("routes : posts", () => {
-    // const { setUp, tearDown, knexInit, knexDestroy } = dbConf(Model)
-    
-    // beforeAll(knexInit)
-    // beforeEach(setUp)
-
-    // afterEach(tearDown)
-    // afterAll(knexDestroy)
 
     describe("GET /posts", () => {
         test("returns all the posts.", async () => {

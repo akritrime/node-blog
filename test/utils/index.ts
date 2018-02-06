@@ -8,16 +8,9 @@ export const knex = Knex(knexConf.test)
 
 export const req = request(app.callback())
 
-export const returnsJSON = (res, opts = {}) => {
-    const check = {
-        type: "application/json",
-        status: 200,
-        ...opts
-    }
-    expect(res.type).toBe(check.type)
-    expect(res.status).toBe(check.status)
-    expect(res.body).toBeInstanceOf(Object)
-}
+// export const returnsJSON = (res, opts = {}) => {
+    
+// }
 
 export const dbConf = (Model) => {
     const knexInit = () => Model.knex(knex)

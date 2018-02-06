@@ -13,3 +13,19 @@ export const withDB = (Model) => (description, tests) => {
         tests()
     })
 }
+
+export const returnsJSON = (req, opts = {}) => (description, tests) => describe(description, () => {
+    test("returns JSON.", async () => {
+        const res = await req.get("/")
+        const check = {
+            type: "application/json",
+            status: 200,
+            ...opts
+        }
+        expect(res.type).toBe(check.type)
+        expect(res.status).toBe(check.status)
+        expect(res.body).toBeInstanceOf(Object)
+    })
+    
+    tests()
+})
