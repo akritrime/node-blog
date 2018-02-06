@@ -4,12 +4,12 @@ import * as Knex from 'knex'
 
 const knexConf = require('../../knexfile')
 
-export const knex = Knex(knexConf.test)
+export const knex = () => Knex(knexConf.test)
 
 export const req = request(app.callback())
 
 export const dbConf = (Model) => {
-    const knexInit = () => Model.knex(knex)
+    const knexInit = () => Model.knex(knex())
 
     const knexDestroy = () => Model.knex().destroy()
     
