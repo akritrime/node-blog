@@ -40,11 +40,16 @@ export const returnsJSON = (req: SuperTest<Test>) => (path: string, status: "suc
     tests()
 })
 
+// expect an error message
+export const expectErr = (res) => {
+    expect(res.body.status).toBe("error")
+    expect(res.body.data).toBeDefined()
+}
+
 // common test for api returning error
 export const returnsErr = (req: SuperTest<Test>) => (path: string) => {
     test("returns proper error message", async () => {
         const res = await req.get("/posts")
-        expect(res.body.status).toBe("error")
-        expect(res.body.data).toBeDefined()
+        expectErr(res)
     })
 }

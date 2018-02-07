@@ -2,7 +2,9 @@ import { req } from './utils'
 import { withDB as _withDB
         , returnsJSON as _returnsJSON
         , withoutDB
-        , returnsErr as _returnsErr 
+        , returnsErr as _returnsErr
+        , expectJSON
+        , expectErr
         } from './utils/commonTestPatterns'
 import { Model } from 'objection'
 
@@ -37,9 +39,27 @@ describe("routes : posts", () => {
             returnsErr("/posts/1")
         })
 
-        describe("POST /posts", () => {
-            test("returns a JSON")
-        })
+        // describe("POST /posts", () => {
+        //     const vars = {
+        //         res: {}
+        //     }
+        //     beforeAll(async () => {
+        //         vars.res = await req
+        //             .post("/posts")
+        //             .send({ 
+        //                 title: "A"
+        //                 , content: "B" 
+        //             }) 
+        //     })
+        //     test("returns a JSON", async () => {
+        //         const { res } = vars
+        //         expectJSON(res, "error")
+        //     })
+
+        //     test("returns proper error message", async() => {
+        //         expectErr(vars.res)
+        //     })
+        // })
     })
     withDB(() => {
 
