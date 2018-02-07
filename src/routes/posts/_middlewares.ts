@@ -36,7 +36,7 @@ export const post: IMiddleware = async (ctx, next) => {
             err.status = 400
             throw err 
         }
-        const post = await Post.query().insert({ title, content })
+        const post = await Post.query().insertAndFetch({ title, content })
         success(ctx, post)
     } catch (err) {
         // console.error(err)

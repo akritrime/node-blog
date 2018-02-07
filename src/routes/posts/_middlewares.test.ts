@@ -61,13 +61,13 @@ describe("middlewares : posts", () => {
             //     ,  () => Post.query().findById(4)
             // )
             test("inserts a new post", async () => {
-                // const ctx = getCtx()
-                // await post(ctx, async() => {})
-                // const insertedPost = Post.query().findById(4)
-                // expect(ctx.body).toEqual({
-                //     status: "success"
-                //     , data: post
-                // })
+                const ctx = getCtx()
+                await post(ctx, async() => {})
+                const insertedPost = await Post.query().findById(4)
+                expect(ctx.body).toEqual({
+                    status: "success"
+                    , data: insertedPost
+                })
             })
         })
     })
