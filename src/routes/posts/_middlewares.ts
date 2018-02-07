@@ -31,8 +31,15 @@ export const getOne: IMiddleware = async (ctx, next) => {
 export const post: IMiddleware = async (ctx, next) => {
     try {
         const { title, content } = ctx.request.body
-        Post.query().insert({})
+        if (!title || !content) {
+            const err = new ErrorWithStatus("Both content and title are needed.")
+            err.status = 400
+            throw err 
+        }
+        const post = await Post.query().insert({ title, content })
+        success(ctx, post)
     } catch (err) {
-        
+        // console.error(err)
+        error(ctx, err, "Error querying for post")
     }
 }
