@@ -31,7 +31,7 @@ export const getOne: IMiddleware = async (ctx, next) => {
 export const post: IMiddleware = async (ctx, next) => {
     try {
         const { title, content } = ctx.request.body
-        if (!title || !content) {
+        if (!(title && content)) {
             const err = new ErrorWithStatus("Both content and title are needed.")
             err.status = 400
             throw err 
