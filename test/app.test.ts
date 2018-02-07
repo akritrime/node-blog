@@ -1,5 +1,9 @@
 import { req } from './utils'
-import { withDB as _withDB, returnsJSON as _returnsJSON, withoutDB, returnsErr as _returnsErr } from './utils/commonTestPatterns'
+import { withDB as _withDB
+        , returnsJSON as _returnsJSON
+        , withoutDB
+        , returnsErr as _returnsErr 
+        } from './utils/commonTestPatterns'
 import { Model } from 'objection'
 
 process.env.NODE_ENV = "test"
@@ -31,6 +35,10 @@ describe("routes : posts", () => {
         
         returnsJSON("/posts/1", "error")("GET /posts/:id", () => {
             returnsErr("/posts/1")
+        })
+
+        describe("POST /posts", () => {
+            test("returns a JSON")
         })
     })
     withDB(() => {

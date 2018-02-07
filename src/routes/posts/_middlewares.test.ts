@@ -69,6 +69,23 @@ describe("middlewares : posts", () => {
                     , data: insertedPost
                 })
             })
+
+            test("returns error", async () => {
+                const ctx = {
+                    ...getCtx(),
+                    request: {
+                        body: {
+                            title: "NEW TITLE AND NO CONTENT"
+                        }
+                    }
+                }
+                await post(ctx, async () => {})
+                expect(ctx.status).toBe(400)
+                expect(ctx.body).toEqual({
+                    status: "error",
+                    data: "Both content and title are needed."
+                })
+            })
         })
     })
 })

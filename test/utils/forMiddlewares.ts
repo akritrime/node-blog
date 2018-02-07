@@ -31,3 +31,11 @@ export const respondsWith = (obj: string, fn: IMiddleware, prmObj, _ctx?: any) =
     expect(ctx.body.status).toBe("success")
     expect(ctx.body.data).toEqual(obj)
 })
+
+// export const raisesErrWithStatus = (fn: IMiddleware, _ctx?: any, _next = async() => {}) => test("returns an error with status", async () => {
+//     const ctx = {
+//         ...getCtx()
+//         , ..._ctx
+//     }
+//     await fn(ctx, _next)
+// })
