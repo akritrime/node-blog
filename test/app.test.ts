@@ -1,13 +1,16 @@
 import { req } from './utils'
-import { withDB, returnsJSON } from './utils/commonTestPatterns'
+import { withDB as _withDB, returnsJSON as _returnsJSON, withoutDB, returnsErr as _returnsErr } from './utils/commonTestPatterns'
 import { Model } from 'objection'
-
 
 process.env.NODE_ENV = "test"
 
+const returnsJSON = _returnsJSON(req)
+const returnsErr = _returnsErr(req)
+const withDB = _withDB(Model)
+
 describe("routes : index.", () => {
     
-    returnsJSON(req)("GET /", () => {
+    returnsJSON("/", "success")("GET /", () => {
         
         test("Returns Hello, World.", async () => {
             const res = await req.get("/")
@@ -20,23 +23,34 @@ describe("routes : index.", () => {
     })
 })
 
-withDB(Model)("routes : posts", () => {
-
-    returnsJSON(req, "/posts")("GET /posts", () => {
-        test("returns all the posts", async () => {
-            const res = await req.get("/posts")
-            expect(res.body.status).toBe("success")
-            expect(res.body.data.length).toBe(3)
+describe("routes : posts", () => {
+    withoutDB(() => {
+        returnsJSON("/posts", "error")("GET /posts", () => {
+            returnsErr("/posts")
+        })
+        
+        returnsJSON("/posts/1", "error")("GET /posts/:id", () => {
+            returnsErr("/posts/1")
         })
     })
+    withDB(() => {
 
-    returnsJSON(req, "/posts/1")("GET /posts/:id", () => {
-        test("returns a specific post", async () => {
-            const res = await req.get("/posts/1")
-            expect(res.body.status).toBe("success")
-            expect(res.body.data).toHaveProperty("id")
-            expect(res.body.data).toHaveProperty("title")
-            expect(res.body.data).toHaveProperty("content")
+        returnsJSON("/posts", "success")("GET /posts", () => {
+            test("returns all the posts", async () => {
+                const res = await req.get("/posts")
+                expect(res.body.status).toBe("success")
+                expect(res.body.data.length).toBe(3)
+            })
+        })
+
+        returnsJSON("/posts/1", "success")("GET /posts/:id", () => {
+            test("returns a specific post", async () => {
+                const res = await req.get("/posts/1")
+                expect(res.body.status).toBe("success")
+                expect(res.body.data).toHaveProperty("id")
+                expect(res.body.data).toHaveProperty("title")
+                expect(res.body.data).toHaveProperty("content")
+            })
         })
     })
 })

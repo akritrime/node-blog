@@ -1,7 +1,10 @@
 import { getAll, getOne } from './_middlewares'
-import { getCtx, returnsErr, withoutDB, respondsWith, withDB } from '../../../test/utils/forMiddlewares'
+import { withDB as _withDB, withoutDB } from '../../../test/utils/commonTestPatterns'
+import { getCtx, returnsErr, respondsWith } from '../../../test/utils/forMiddlewares'
 import { Model } from 'objection'
 import { Post } from '../../db/models/post'
+
+const withDB = _withDB(Model)
 
 describe("middlewares : posts", () => {
     describe("getAll : ", () => {
@@ -9,7 +12,7 @@ describe("middlewares : posts", () => {
             returnsErr(getAll)
         })
     
-        withDB(Model, () => {
+        withDB(() => {
             respondsWith("all the posts", getAll,  () => Post.query())
         })
     })
@@ -19,7 +22,7 @@ describe("middlewares : posts", () => {
             returnsErr(getOne)
         })
     
-        withDB(Model, () => {
+        withDB(() => {
             respondsWith("specific post", getOne,  () => Post.query().where("id", 1).then(arr => arr[0]))
 
             describe("on requesting with an unabsent id", () => {
