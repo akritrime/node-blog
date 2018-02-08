@@ -11,7 +11,14 @@ export const req = request(app.callback())
 export const dbConf = (Model) => {
     const knexInit = () => Model.knex(knex())
 
-    const knexDestroy = () => Model.knex().destroy()
+    const knexDestroy = async () => {
+        await Model.knex()
+            .migrate
+            .rollback()
+
+        await Model.knex()
+            .destroy()
+    }
     
     const setUp = async () => {
         await Model.knex()
