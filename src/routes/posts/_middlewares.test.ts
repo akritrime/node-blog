@@ -3,8 +3,12 @@ import { withDB as _withDB, withoutDB } from '../../../test/utils/commonTestPatt
 import { getCtx, returnsErr, respondsWith } from '../../../test/utils/forMiddlewares'
 import { Model } from 'objection'
 import { Post } from '../../db/models/post'
+import { dbConf } from '../../../test/utils/index';
 
 const withDB = _withDB(Model)
+const { knexInit, knexDestroy} = dbConf(Model)
+beforeAll(knexInit)
+afterAll(knexDestroy)
 
 describe("middlewares : posts", () => {
     describe("getAll : ", () => {

@@ -6,11 +6,10 @@ import { SuperTest, Test } from 'supertest'
 export const withDB = (Model) => (tests: jest.EmptyFunction) => describe("with db properly initialized", () => {
     const { setUp, tearDown, knexInit, knexDestroy } = dbConf(Model)
     
-    beforeAll(knexInit)
+    
     beforeEach(setUp)
     
     afterEach(tearDown)
-    afterAll(knexDestroy)
     
     tests()
 })
