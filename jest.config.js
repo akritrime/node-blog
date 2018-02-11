@@ -17,5 +17,7 @@ module.exports = {
     },
     "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(js|ts)$",
     "modulePathIgnorePatterns": ["test/utils", "db/test", "dist/"],
-    "coveragePathIgnorePatterns": ["knex_migrations/","knex_seeds/", "src/server.ts"]
+    "coveragePathIgnorePatterns": ["knex_migrations/","knex_seeds/", "src/server.ts"],
+    // "globalSetup": "./db_setup.js",
+    // "globalTeardown": "./db_teardown.js"
 }

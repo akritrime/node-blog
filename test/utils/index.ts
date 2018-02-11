@@ -2,10 +2,11 @@ import { app } from '../../src/app'
 import * as request from 'supertest'
 import * as Knex from 'knex'
 import { ModelClass } from 'objection';
+import { expect } from 'chai'
 
 const knexConf = require('../../knexfile')
 
-export const knex = () => Knex(knexConf.test)
+export const knex = () => Knex(knexConf[process.env.NODE_ENV])
 
 export const req = request(app.callback())
 
@@ -34,13 +35,28 @@ export const dbConf = (Model: ModelClass<any>) => {
         .run();
 
     const setUp = async () => {
-        await rollback()
+        // knexInit()
+        try {
+            await rollback()
             .then(migrate)
             .then(seed)
+        } catch (err) {
+            await Model.knex().table("knex_migartions_lock").del()
+            
+            await rollback()
+            .then(migrate)
+            .then(seed)
+        }
     }
 
     const tearDown = async () => {
-        await rollback()
+        try {
+            await rollback()
+        } catch (_) {
+            await Model.knex().table("knex_migartions_lock").del()
+            await rollback()
+        }
+        
     }
 
     return {

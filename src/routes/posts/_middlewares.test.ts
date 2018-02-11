@@ -1,95 +1,184 @@
 import { getAll, getOne, post } from './_middlewares'
-import { withDB as _withDB, withoutDB } from '../../../test/utils/commonTestPatterns'
-import { getCtx, returnsErr, respondsWith } from '../../../test/utils/forMiddlewares'
+
+import { getCtx
+       , returnsErr
+       , returnsSuccess
+       } from '../../../test/utils/forMiddlewares'
+
 import { Model } from 'objection'
 import { Post } from '../../db/models/post'
 import { dbConf } from '../../../test/utils/index';
 
-const withDB = _withDB(Model)
-const { knexInit, knexDestroy} = dbConf(Model)
+const { knexInit
+      , knexDestroy
+      , setUp
+      , tearDown
+      } = dbConf(Model)
+
+const next = async () => {}
+
 beforeAll(knexInit)
 afterAll(knexDestroy)
 
 describe("middlewares : posts", () => {
     describe("getAll : ", () => {
-        withoutDB(() => {   
-            returnsErr(getAll)
+        
+        describe("without DB connection" , () => {
+            const ctx = getCtx()
+            beforeAll(async () => await getAll(ctx, next))
+            it("responds with an error", async () => {
+                returnsErr(ctx)
+            })
         })
-    
-        withDB(() => {
-            respondsWith("all the posts", getAll, () => Post.query()
-            )
+
+        describe("with DB connection", () => {
+            const ctx = getCtx()
+
+            beforeEach(async () => { 
+                await setUp()
+                await getAll(ctx, next)
+            })
+            afterEach(tearDown)
+            
+            it("responds with success", async () => {
+                returnsSuccess(ctx)
+            })
+
+            it("response has all the posts", async () => {
+                const posts  = await Post.query()
+                expect(posts.length).toBe(3)
+                expect(ctx.body.data.length).toBe(3)
+                expect(ctx.body.data).toEqual(posts)
+            })
+
         })
     })
 
     describe("getOne : ", () => {
-        withoutDB(() => {   
-            returnsErr(getOne)
-        })
-    
-        withDB(() => {
-            respondsWith(
-                "specific post"
-                , getOne
-                ,  () => Post.query().where("id", 1).then(arr => arr[0])
-            )
 
-            describe("on requesting with an unabsent id", () => {
-                test("returns error", async () => {
-                    const ctx = {
-                        ...getCtx(),
-                        params: {
-                            id: 23
-                        }
-                    }
-                    await getOne(ctx, async () => {})
-                    expect(ctx.status).toBe(404)
-                    expect(ctx.body).toEqual({
-                        status: "error",
-                        data: "Post with id 23 doesn't exist."
-                    })
-                })
+        describe("without DB connection" , () => {
+            const ctx = getCtx()
+            beforeAll(async () => await getOne(ctx, next))
+            it("responds with an error", async () => {
+                returnsErr(ctx)
             })
         })
+
+        describe("with DB connection", () => {
+            const ctx = getCtx()
+            const properties = ["id","title", "content"]
+
+            beforeEach(setUp)
+            afterEach(tearDown)
+            
+            it("responds with success", async () => {
+                await getOne(ctx, next)
+                returnsSuccess(ctx)
+            })
+
+            it("response with specific post", async () => {
+                const post = await Post.query().findById(1)
+                await getOne(ctx, next)
+                properties.map( v => {
+                    expect(post).toHaveProperty(v)
+                    expect(ctx.body.data).toHaveProperty(v)
+                })
+                // expect(ctx.body.data.length).toBe(3)
+                expect(ctx.body.data).toEqual(post)
+            })
+
+            it("errors for wrong id", async () => {
+                const ctx = {
+                    ...getCtx(),
+                    params: {
+                        id: 4
+                    }
+                }
+                await getOne(ctx, next)
+                returnsErr(ctx)
+                expect(ctx.status).toBe(404)
+                expect(ctx.body.data).toBe("Post with id 4 doesn't exist.")
+            })
+
+        })
+
     })
 
     describe("post : ", () => {
-        withoutDB(() => {
-            returnsErr(post)
+
+        describe("without DB connection" , () => {
+            const ctx = getCtx()
+            beforeAll(async () => await post(ctx, next))
+            it("responds with an error", async () => {
+                returnsErr(ctx)
+            })
         })
 
-        withDB(() => {
-            // respondsWith(
-            //     "specific post"
-            //     , getOne
-            //     ,  () => Post.query().findById(4)
-            // )
-            test("inserts a new post", async () => {
-                const ctx = getCtx()
-                await post(ctx, async() => {})
-                const insertedPost = await Post.query().findById(4)
-                expect(ctx.body).toEqual({
-                    status: "success"
-                    , data: insertedPost
-                })
+        describe("with DB connection", () => {
+            const ctx = getCtx()
+            const properties = ["id","title", "content"]
+
+            beforeEach(setUp)
+            afterEach(tearDown)
+            
+            it("responds with success", async () => {
+                await post(ctx, next)
+                returnsSuccess(ctx)
             })
 
-            test("returns error", async () => {
-                const ctx = {
-                    ...getCtx(),
-                    request: {
-                        body: {
-                            title: "NEW TITLE AND NO CONTENT"
-                        }
+            it("response with specific post", async () => {
+                await post(ctx, next)
+                const newPost = await Post.query().findById(4)
+                
+                properties.map( v => {
+                    expect(newPost).toHaveProperty(v)
+                    expect(ctx.body.data).toHaveProperty(v)
+                })
+                // expect(ctx.body.data.length).toBe(3)
+                expect(ctx.body.data).toEqual(newPost)
+            })
+
+            it("inserts a new post", async () => {
+                const before = await Post.query()
+                await post(ctx, next)
+                const after = await Post.query()
+                expect(before.length).toBe(after.length - 1)
+            })
+
+            it("requires both title and content", async () => {
+                const expectErr = async (req) => {
+                    const ctx = {
+                        ...getCtx(),
+                        ...req
                     }
+                    await post(ctx, async () => {})
+                    expect(ctx.status).toBe(400)
+                    expect(ctx.body).toEqual({
+                        status: "error",
+                        data: "Both content and title are needed."
+                    })
                 }
-                await post(ctx, async () => {})
-                expect(ctx.status).toBe(400)
-                expect(ctx.body).toEqual({
-                    status: "error",
-                    data: "Both content and title are needed."
-                })
+                
+                await Promise.all([
+                    expectErr({
+                        request: {
+                            body: {
+                                title: "NEW TITLE AND NO CONTENT"
+                            }
+                        }
+                    })
+                    , expectErr({
+                        request: {
+                            body: {
+                                content: "NEW CONTENT AND NO TITLE"
+                            }
+                        }
+                    })
+                ])
             })
+
         })
+
     })
+
 })

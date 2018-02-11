@@ -1,84 +1,117 @@
-// import { req } from './utils'
-// import { withDB as _withDB
-//         , returnsJSON as _returnsJSON
-//         , withoutDB
-//         , returnsErr as _returnsErr
-//         , expectJSON
-//         , expectErr
-//         } from './utils/commonTestPatterns'
-// import { Model } from 'objection'
+import { req, knex, dbConf } from './utils'
+import { expectJSON
+    //    , expectErr
+       , expectPost
+       } from './utils/commonTestPatterns'
+import { Model } from 'objection'
 
-// process.env.NODE_ENV = "test"
+process.env.NODE_ENV = "development"
 
-// const returnsJSON = _returnsJSON(req)
-// const returnsErr = _returnsErr(req)
-// const withDB = _withDB(Model)
+describe("routes : index.", () => {
+    const res = req.get("/")
+    describe("GET /", () => {
+        it("responds with JSON", async () => {
+            expectJSON(await res, "success")
+        })
 
-// describe("routes : index.", () => {
-    
-//     returnsJSON("/", "success")("GET /", () => {
+        it("responds with hello,world", async () => {
+            const response = await res
+            expect(response.body.data).toBe("Hello, World!")
+        })
+    })
+})
+
+describe("routes : posts", () => {
+    const { knexInit, setUp, tearDown, knexDestroy } = dbConf(Model)
+    beforeAll(async () => {
+        await knexInit()
+        await setUp()
+    })
+
+    afterAll(async () => {
+        await tearDown()
+        await knexDestroy()
+    })
+
+    describe("GET /posts", () => {
         
-//         test("Returns Hello, World.", async () => {
-//             const res = await req.get("/")
-//             expect(res.body).toEqual({
-//                 status: "success"
-//                 , message: "Hello, World!"
-//             })
-//         })
+        it("returns a JSON with success status", async () => {
+            const res = await req.get("/posts")
+            expectJSON(res, "success")
+        })
+
+        it("returns all the posts", async () => {
+            const { body } = await req.get("/posts")
+            expect(body.data.length).toBe(3)
+            Array.from(body.data).map((v: any, i) => {
+                expectPost(v, i+1)
+            })
+        })
+    })
+
+    describe("GET /posts/:id", () => {
         
-//     })
-// })
+        it("returns a JSON with success status", async () => {
+            const res = await req.get("/posts/1")
+            expectJSON(res, "success")
+        })
 
-// describe("routes : posts", () => {
-//     withoutDB(() => {
-//         returnsJSON("/posts", "error")("GET /posts", () => {
-//             returnsErr("/posts")
-//         })
-        
-//         returnsJSON("/posts/1", "error")("GET /posts/:id", () => {
-//             returnsErr("/posts/1")
-//         })
+        it("returns specific posts", async () => {
+            const { body: { data } } = await req.get("/posts/1")
+            expectPost(data)
+        })
 
-//         // describe("POST /posts", () => {
-//         //     const vars = {
-//         //         res: {}
-//         //     }
-//         //     beforeAll(async () => {
-//         //         vars.res = await req
-//         //             .post("/posts")
-//         //             .send({ 
-//         //                 title: "A"
-//         //                 , content: "B" 
-//         //             }) 
-//         //     })
-//         //     test("returns a JSON", async () => {
-//         //         const { res } = vars
-//         //         expectJSON(res, "error")
-//         //     })
+        it("errors on providing unavailable id", async () => {
+            const res = await req.get("/posts/9999")
+            expectJSON(res, "error")
+            expect(res.status).toBe(404)
+            expect(res.body.data).toBe("Post with id 9999 doesn't exist.")
+        })
+    })
 
-//         //     test("returns proper error message", async() => {
-//         //         expectErr(vars.res)
-//         //     })
-//         // })
-//     })
-//     withDB(() => {
+    describe("POST posts/", () => {
+        const vars: any = {} 
+        const newPost = {
+            title: "Title worthy of a fine content"
+            , content: "Thee shall see my content."
+        }
 
-//         returnsJSON("/posts", "success")("GET /posts", () => {
-//             test("returns all the posts", async () => {
-//                 const res = await req.get("/posts")
-//                 expect(res.body.status).toBe("success")
-//                 expect(res.body.data.length).toBe(3)
-//             })
-//         })
+        beforeAll(async () => {
+            vars.res = await req.post("/posts").send(newPost)
+        })
 
-//         returnsJSON("/posts/1", "success")("GET /posts/:id", () => {
-//             test("returns a specific post", async () => {
-//                 const res = await req.get("/posts/1")
-//                 expect(res.body.status).toBe("success")
-//                 expect(res.body.data).toHaveProperty("id")
-//                 expect(res.body.data).toHaveProperty("title")
-//                 expect(res.body.data).toHaveProperty("content")
-//             })
-//         })
-//     })
-// })
+        it("returns a JSON with success status", async () => {
+            const { res } = vars
+            expectJSON(res, "success")
+        })
+
+        it("returns a Post", async () => {
+            const { res } = vars
+            expectPost(res.body.data)
+        })
+
+        it("has the right title and content", () => {
+            const { data } = vars.res.body
+            expect(data.title).toBe(newPost.title)
+            expect(data.content).toBe(newPost.content)
+        })
+
+
+        it("adds a new post to the database", async () => {
+            const res = await req.get("/posts")
+            const { body } = res
+            const { data: post } = vars.res.body
+            expect(body.data.length).toBe(4)
+            expect(post.id).toBe(4)
+        })
+
+        it("needs both title and content", async () => {
+            const res = await req.post("/posts").send({
+                title: "No Content for ya"
+            })
+            const { body: { data: allPosts } } = await req.get("/posts")
+            expectJSON(res, "error")    
+            expect(allPosts.length).toBe(4)
+        })
+    })
+})
