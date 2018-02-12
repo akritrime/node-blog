@@ -2,29 +2,40 @@ import { Base } from './base'
 
 export class User extends Base {
 
-    username?: string
-    firstname?: string
-    lastname?: string
+    userName?: string
+    firstName?: string
+    lastName?: string
     email?: string
-    password?: string
-    salt?: string
+    private passwordHash?: string
+    private salt?: string
 
     static tableName  = "posts"
     static jsonSchema = {
         type: 'object'
-        , required: ['username', 'email']
+        , required: ['username', 'email', 'passwordHash', 'salt']
         , properties: {
             id: { type: 'integer' }
-            , title: { 
-                type: 'string'
-                , minLength: 1
-                , maxLength: 255 
-            }
-            , content: { type: 'string' }
+            , userName: { type: 'string'
+                        , minLength: 1
+                        , maxLength: 255 
+                        }
+            , firstName: { type: 'string'
+                         , minLength: 1
+                         , maxLength: 255 
+                         }
+            , lastName: { type: 'string'
+                        , minLength: 1
+                        , maxLength: 255 
+                        }
+            , email: { type: 'string' 
+                     , format: 'email'
+                     }
+            , passwordHash: { type: 'string' }
+            , salt: { type: 'string' }
         }
     }
 
     fullname() {
-        return `${this.firstname} ${this.lastname}` 
+        return `${this.firstName} ${this.lastName}` 
     }
 }

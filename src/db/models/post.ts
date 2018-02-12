@@ -10,11 +10,10 @@ export class Post extends Base {
         , required: ['title', 'content']
         , properties: {
             id: { type: 'integer' }
-            , title: { 
-                type: 'string'
-                , minLength: 1
-                , maxLength: 255 
-            }
+            , title: { type: 'string'
+                     , minLength: 1
+                     , maxLength: 255 
+                     }
             , content: { type: 'string' }
         }
     }
