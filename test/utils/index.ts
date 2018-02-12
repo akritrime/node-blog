@@ -2,7 +2,6 @@ import { app } from '../../src/app'
 import * as request from 'supertest'
 import * as Knex from 'knex'
 import { ModelClass } from 'objection';
-import { expect } from 'chai'
 
 const knexConf = require('../../knexfile')
 
