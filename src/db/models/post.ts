@@ -5,6 +5,8 @@ export class Post extends Model {
     id?: number
     title?: string
     content?: string
+    created_at?: string
+    updated_at?: string
 
     static tableName  = "posts"
     static jsonSchema = {
@@ -20,5 +22,15 @@ export class Post extends Model {
             , content: { type: 'string' }
         }
     }
+
+    $beforeInsert() {
+        this.created_at = new Date().toISOString();
+        delete this.updated_at;
+      }
+    
+      $beforeUpdate() {
+        this.updated_at = new Date().toISOString();
+        delete this.created_at;
+      }
     
 } 

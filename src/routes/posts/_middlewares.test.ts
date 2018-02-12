@@ -1,4 +1,4 @@
-import { getAll, getOne, post } from './_middlewares'
+import { getAll, getOne, post, put } from './_middlewares'
 
 import { getCtx
        , returnsErr
@@ -14,6 +14,8 @@ const { knexInit
       , setUp
       , tearDown
       } = dbConf(Model)
+      
+process.env.NODE_ENV = "test_posts"
 
 const next = async () => {}
 
@@ -42,6 +44,7 @@ describe("middlewares : posts", () => {
             
             it("responds with success", async () => {
                 returnsSuccess(ctx)
+                // console.log(Model.knex().client.config.connection)
             })
 
             it("response has all the posts", async () => {
@@ -149,7 +152,13 @@ describe("middlewares : posts", () => {
                 const expectErr = async (req) => {
                     const ctx = {
                         ...getCtx(),
-                        ...req
+                        ...{
+                            request: {
+                                body: {
+                                    ...req
+                                }
+                            }
+                        }
                     }
                     await post(ctx, async () => {})
                     expect(ctx.status).toBe(400)
@@ -160,21 +169,92 @@ describe("middlewares : posts", () => {
                 }
                 
                 await Promise.all([
-                    expectErr({
-                        request: {
-                            body: {
-                                title: "NEW TITLE AND NO CONTENT"
-                            }
-                        }
-                    })
-                    , expectErr({
-                        request: {
-                            body: {
-                                content: "NEW CONTENT AND NO TITLE"
-                            }
-                        }
-                    })
+                    expectErr( {title: "NEW TITLE AND NO CONTENT"})
+                    , expectErr({content: "NEW CONTENT AND NO TITLE"})
                 ])
+            })
+
+        })
+
+    })
+
+    describe("put : ", () => {
+
+        describe("without DB connection" , () => {
+            const ctx = getCtx()
+            beforeAll(async () => await put(ctx, next))
+            it("responds with an error", async () => {
+                returnsErr(ctx)
+            })
+        })
+
+        describe("with DB connection", () => {
+            const vars: any = {}
+            const ctx = getCtx()
+            const properties = ["id","title", "content"]
+
+            beforeAll(async () => {
+                await setUp()
+                vars.post = await Post.query().findById(1)
+                await put(ctx, next)
+                vars.updatedPost = await Post.query().findById(1)
+            })
+
+            // beforeEach(setUp)
+            afterAll(tearDown)
+            
+            it("responds with success", async () => {
+                // await put(ctx, next)
+                returnsSuccess(ctx)
+            })
+
+            it("response with specific post", async () => {
+                // await put(ctx, next)
+                
+                properties.map( v => {
+                    expect(vars.updatedPost).toHaveProperty(v)
+                    expect(ctx.body.data).toHaveProperty(v)
+                })
+                // expect(ctx.body.data.length).toBe(3)
+                expect(ctx.body.data).toEqual(vars.updatedPost)
+            })
+
+            it("updated the specified post", async () => {
+                const { post, updatedPost } = vars
+                expect(post).not.toEqual(updatedPost)
+                const { request: { body: {title, content}}} = getCtx()
+                expect(updatedPost.title).toBe(title)
+                expect(updatedPost.content).toBe(content)
+            })
+
+            it("errors for wrong id", async () => {
+                const ctx = {
+                    ...getCtx(),
+                    params: {
+                        id: 99
+                    }
+                }
+                await put(ctx, next)
+                returnsErr(ctx)
+                expect(ctx.status).toBe(404)
+                expect(ctx.body.data).toBe("Post with id 99 doesn't exist.")
+            })
+
+            it("errors if neither title or content is provided", async () => {
+                const ctx = {
+                    ...getCtx(),
+                    ...{
+                        request: {
+                            body: {
+                                
+                            }
+                        }
+                    }
+                }
+                await put(ctx, async () => {})
+                returnsErr(ctx)
+                expect(ctx.status).toBe(400)
+                expect(ctx.body.data).toEqual("Needs either title or content")
             })
 
         })

@@ -5,7 +5,7 @@ import { expectJSON
        } from './utils/commonTestPatterns'
 import { Model } from 'objection'
 
-process.env.NODE_ENV = "development"
+process.env.NODE_ENV = "test"
 
 describe("routes : index.", () => {
     const res = req.get("/")
@@ -113,5 +113,56 @@ describe("routes : posts", () => {
             expectJSON(res, "error")    
             expect(allPosts.length).toBe(4)
         })
+    })
+
+    describe("PUT /posts/:id", () => {
+        const vars: any  = {}
+        const newTitle = "something new"
+        const newContent = "something new for you too"
+        const testPath = "/posts/1";
+        beforeAll(async () => {
+            vars.before = await req.get(testPath)
+            await setTimeout(() => Promise.resolve(42), 10000)
+            vars.res = await req.put(testPath).send({title: newTitle})
+            vars.after = await req.get(testPath)
+        })
+
+        it("returns a JSON with success status", () => {
+            const { res } = vars
+            expectJSON(res, "success")
+        })
+
+        it("returns a Post", () => {
+            const { res } = vars
+            expectPost(res.body.data)
+        })
+
+        it("has the right title and content", () => {
+            const { data } = vars.res.body
+            const { data: before } = vars.before.body
+            expect(data.title).toBe(newTitle)
+            expect(data.content).toBe(before.content)
+        })
+
+        it("updates the post", async () => {
+            const { data: before } = vars.before.body
+            // console.log(await req.get(testPath))
+            const { data: after } = vars.after.body
+            // console.log(before, after)
+            expect(before.created_at).toBe(after.created_at)
+            expect(before.updated_at).not.toBe(after.updated_at)
+            expect(after.content).toBe(before.content)
+            expect(after.title).toBe(newTitle)
+            await req.put(testPath).send({content: newContent})
+            const { body: { data: update } } = await req.get(testPath)
+            expect(update.updated_at).not.toBe(after.updated_at)
+            expect(update.content).toBe(newContent)
+        })
+
+        it("errors on sending nothing", async () => {
+            const res = await req.put(testPath).send({})
+            expectJSON(res, "error")
+        })
+
     })
 })

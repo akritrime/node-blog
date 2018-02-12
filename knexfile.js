@@ -16,13 +16,56 @@ module.exports = {
     },
     migrations: {
       directory: join(BASE_PATH, 'knex_migrations'),
-      tableName: "knex_migartions"
+      tableName: "knex_migrations"
     },
     seeds: {
-      directory: join(BASE_PATH, 'test', 'knex_seeds'),
+      directory: join(BASE_PATH, 'knex_seeds'),
       tableName: "knex_seeds"
     }
   },
+
+  test_posts: {
+    client: 'pg',
+    connection: {
+      database: 'api_test_posts',
+      user:     'postgres',
+      password: 'secret_password'
+    },
+    pool: {
+      min: 2,
+      max: 10
+    },
+    migrations: {
+      directory: join(BASE_PATH, 'knex_migrations'),
+      tableName: "knex_migrations"
+    },
+    seeds: {
+      directory: join(BASE_PATH, 'knex_seeds'),
+      tableName: "knex_seeds"
+    }
+  },
+
+  test_users: {
+    client: 'pg',
+    connection: {
+      database: 'api_test_users',
+      user:     'postgres',
+      password: 'secret_password'
+    },
+    pool: {
+      min: 2,
+      max: 10
+    },
+    migrations: {
+      directory: join(BASE_PATH, 'knex_migrations'),
+      tableName: "knex_migrations"
+    },
+    seeds: {
+      directory: join(BASE_PATH, 'knex_seeds'),
+      tableName: "knex_seeds"
+    }
+  },
+
 
   development: {
     client: 'pg',
@@ -37,10 +80,10 @@ module.exports = {
     },
     migrations: {
       directory: join(BASE_PATH, 'knex_migrations'),
-      tableName: "knex_migartions"
+      tableName: "knex_migrations"
     },
     seeds: {
-      directory: join(BASE_PATH, 'development', 'knex_seeds'),
+      directory: join(BASE_PATH, 'knex_seeds'),
       tableName: "knex_seeds"
     }
   }

@@ -16,5 +16,9 @@ export const error = (ctx: Context, err: any = {}, msg?: string) => {
 }
 
 export class ErrorWithStatus extends Error {
-    status?: number
+    status: number
+    constructor(msg: string, status: number) {
+        super(msg)
+        this.status = status
+    }
 }
