@@ -15,7 +15,7 @@ export const getOne: IMiddleware = async (ctx, next) => {
     try {
         const id = ctx.params.id
         const post = await Post.query().findById(id)
-        // console.log((<Post>post).created_at)
+        // console.log((<Post>post).createdAt)
         
         if(!post) {
             throw new ErrorWithStatus(`Post with id ${id} doesn't exist.`, 404)

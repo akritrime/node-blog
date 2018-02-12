@@ -1,4 +1,4 @@
-import { req, knex, dbConf } from './utils'
+import { req, dbConf } from './utils'
 import { expectJSON
     //    , expectErr
        , expectPost
@@ -149,13 +149,13 @@ describe("routes : posts", () => {
             // console.log(await req.get(testPath))
             const { data: after } = vars.after.body
             // console.log(before, after)
-            expect(before.created_at).toBe(after.created_at)
-            expect(before.updated_at).not.toBe(after.updated_at)
+            expect(before.createdAt).toBe(after.createdAt)
+            expect(before.updatedAt).not.toBe(after.updatedAt)
             expect(after.content).toBe(before.content)
             expect(after.title).toBe(newTitle)
             await req.put(testPath).send({content: newContent})
             const { body: { data: update } } = await req.get(testPath)
-            expect(update.updated_at).not.toBe(after.updated_at)
+            expect(update.updatedAt).not.toBe(after.updatedAt)
             expect(update.content).toBe(newContent)
         })
 

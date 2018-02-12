@@ -1,11 +1,7 @@
 import { app } from '../../src/app'
 import * as request from 'supertest'
-import * as Knex from 'knex'
 import { ModelClass } from 'objection';
-
-const knexConf = require('../../knexfile')
-
-export const knex = () => Knex(knexConf[process.env.NODE_ENV])
+import { knex } from './../../src/db/utils'
 
 export const req = request(app.callback())
 

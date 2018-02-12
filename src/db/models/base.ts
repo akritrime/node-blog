@@ -3,17 +3,17 @@ import { Model } from 'objection'
 export class Base extends Model {
 
     id?: number
-    created_at?: string
-    updated_at?: string
+    createdAt?: string
+    updatedAt?: string
 
     $beforeInsert() {
-        this.created_at = new Date().toISOString();
-        delete this.updated_at;
+        this.createdAt = new Date().toISOString();
+        delete this.updatedAt;
       }
     
       $beforeUpdate() {
-        this.updated_at = new Date().toISOString();
-        delete this.created_at;
+        this.updatedAt = new Date().toISOString();
+        delete this.createdAt;
       }
     
 } 
