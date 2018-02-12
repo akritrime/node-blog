@@ -1,4 +1,4 @@
-import { getAll, getOne, post, put } from './_middlewares'
+import { getAll, getOne, post, put, del } from './_middlewares'
 
 import { getCtx
        , returnsErr
@@ -19,8 +19,8 @@ process.env.NODE_ENV = "test_posts"
 
 const next = async () => {}
 
-beforeAll(knexInit)
-afterAll(knexDestroy)
+// beforeAll(knexInit)
+// afterAll(knexDestroy)
 
 describe("middlewares : posts", () => {
     describe("getAll : ", () => {
@@ -35,6 +35,9 @@ describe("middlewares : posts", () => {
 
         describe("with DB connection", () => {
             const ctx = getCtx()
+            
+            beforeAll(knexInit)
+            afterAll(knexDestroy)
 
             beforeEach(async () => { 
                 await setUp()
@@ -70,6 +73,9 @@ describe("middlewares : posts", () => {
         describe("with DB connection", () => {
             const ctx = getCtx()
             const properties = ["id","title", "content"]
+            
+            beforeAll(knexInit)
+            afterAll(knexDestroy)
 
             beforeEach(setUp)
             afterEach(tearDown)
@@ -120,6 +126,9 @@ describe("middlewares : posts", () => {
         describe("with DB connection", () => {
             const ctx = getCtx()
             const properties = ["id","title", "content"]
+
+            beforeAll(knexInit)
+            afterAll(knexDestroy)
 
             beforeEach(setUp)
             afterEach(tearDown)
@@ -194,6 +203,7 @@ describe("middlewares : posts", () => {
             const properties = ["id","title", "content"]
 
             beforeAll(async () => {
+                await knexInit()
                 await setUp()
                 vars.post = await Post.query().findById(1)
                 await put(ctx, next)
@@ -201,7 +211,10 @@ describe("middlewares : posts", () => {
             })
 
             // beforeEach(setUp)
-            afterAll(tearDown)
+            afterAll(async () => {
+                await tearDown()
+                await knexDestroy()
+            })
             
             it("responds with success", async () => {
                 // await put(ctx, next)
@@ -255,6 +268,76 @@ describe("middlewares : posts", () => {
                 returnsErr(ctx)
                 expect(ctx.status).toBe(400)
                 expect(ctx.body.data).toEqual("Needs either title or content")
+            })
+
+        })
+
+    })
+
+    describe("del : ", () => {
+
+        describe("without DB connection" , () => {
+            const ctx = getCtx()
+            beforeAll(async () => await del(ctx, next))
+            it("responds with an error", async () => {
+                returnsErr(ctx)
+            })
+        })
+
+        describe("with DB connection", () => {
+            const vars: any = {}
+            const ctx = getCtx()
+            const properties = ["id","title", "content"]
+
+            beforeAll(async () => {
+                await knexInit()
+                await setUp()
+                vars.before = await Post.query()
+                vars.post = await Post.query().findById(1)
+                await del(ctx, next)
+                vars.after = await Post.query()
+            })
+
+            // beforeEach(setUp)
+            afterAll(async () => {
+                await tearDown()
+                await knexDestroy()
+            })
+            
+            it("responds with success", async () => {
+                // await del(ctx, next)
+                returnsSuccess(ctx)
+                // console.log(vars.after.length)
+            })
+
+            it("response with specific post", async () => {
+                // await del(ctx, next)
+                
+                properties.map( v => {
+                    // expect(vars.updatedPost).toHaveProperty(v)
+                    expect(ctx.body.data).toHaveProperty(v)
+                })
+                // expect(ctx.body.data.length).toBe(3)
+                expect(ctx.body.data).toEqual(vars.post)
+            })
+
+            it("deleted the specified post", async () => {
+                expect(vars.before.length).toBe(vars.after.length + 1)
+                const post = await Post.query().findById(1)
+                expect(post).toBeUndefined()
+            })
+
+            it("errors for wrong id", async () => {
+                const ctx = {
+                    ...getCtx(),
+                    params: {
+                        id: 99
+                    }
+                }
+                await del(ctx, next)
+                returnsErr(ctx)
+                expect(ctx.status).toBe(404)
+                expect(ctx.body.data).toBe("Post with id 99 doesn't exist.")
             })
 
         })

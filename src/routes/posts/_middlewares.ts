@@ -66,3 +66,20 @@ export const put: IMiddleware = async (ctx, next) => {
         error(ctx, err, "Error with updating post")
     }
 }
+
+export const del: IMiddleware = async (ctx, next) => {
+    try {
+        const id = ctx.params.id
+        const post = await Post.query()
+            .where('id', id)
+            .del()
+            .returning("*")
+            .first()
+        
+        if(!post) throw new ErrorWithStatus(`Post with id ${id} doesn't exist.`, 404)
+
+        success(ctx, post)
+    } catch (err) {
+        error(ctx, err, "Error deleting post")
+    }
+}

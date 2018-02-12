@@ -122,7 +122,7 @@ describe("routes : posts", () => {
         const testPath = "/posts/1";
         beforeAll(async () => {
             vars.before = await req.get(testPath)
-            await setTimeout(() => Promise.resolve(42), 10000)
+            // await new Promise((resolve) => setTimeout(() => resolve(42), 10000))
             vars.res = await req.put(testPath).send({title: newTitle})
             vars.after = await req.get(testPath)
         })
@@ -161,6 +161,40 @@ describe("routes : posts", () => {
 
         it("errors on sending nothing", async () => {
             const res = await req.put(testPath).send({})
+            expectJSON(res, "error")
+        })
+
+    })
+
+    describe("DELETE /posts/:id", () => {
+        const vars: any  = {}
+        const newTitle = "something new"
+        const newContent = "something new for you too"
+        const testPath = "/posts/1";
+        beforeAll(async () => {
+            vars.before = await req.get(testPath)
+            // await new Promise((resolve) => setTimeout(() => resolve(42), 10000))
+            vars.res = await req.del(testPath).send({title: newTitle})
+            vars.after = await req.get(testPath)
+        })
+
+        it("returns a JSON with success status", () => {
+            const { res } = vars
+            expectJSON(res, "success")
+        })
+
+        it("returns a Post", () => {
+            const { res } = vars
+            expectPost(res.body.data)
+        })
+
+        it("deletes the post", () => {
+            expectJSON(vars.before, "success")
+            expectJSON(vars.after, "error")
+        })
+
+        it("errors on wrong id", async () => {
+            const res = await req.del("/posts/9")
             expectJSON(res, "error")
         })
 
