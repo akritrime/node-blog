@@ -1,4 +1,5 @@
-import { req, dbConf } from './utils'
+import { req } from './utils'
+import { dbConf } from '../src/db/utils';
 import { expectJSON
     //    , expectErr
        , expectPost

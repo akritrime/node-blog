@@ -1,17 +1,18 @@
-import { IMiddleware } from "koa-router"
-import { Post } from '../../db/models/post'
+import { Middleware } from "koa"
+import { Post } from '../../db/models'
 import { success, error, ErrorWithStatus } from '../../utils/forCtx'
 
-export const getAll: IMiddleware = async (ctx, next) => {
+export const getAll: Middleware = async (ctx, next) => {
     try {
         const posts = await Post.query()
         success(ctx, posts)
+        return next()
     } catch (err) {
         error(ctx, err, "Error querying for posts")
     }
 }
 
-export const getOne: IMiddleware = async (ctx, next) => {
+export const getOne: Middleware = async (ctx, next) => {
     try {
         const id = ctx.params.id
         const post = await Post.query().findById(id)
@@ -21,13 +22,14 @@ export const getOne: IMiddleware = async (ctx, next) => {
             throw new ErrorWithStatus(`Post with id ${id} doesn't exist.`, 404)
         }
         success(ctx, post)
+        return next()
     } catch (err) {
         // console.error(err)
         error(ctx, err, "Error querying for post")
     }
 }
 
-export const post: IMiddleware = async (ctx, next) => {
+export const post: Middleware = async (ctx, next) => {
     try {
         const { title, content } = ctx.request.body
         if (!(title && content)) {
@@ -37,13 +39,14 @@ export const post: IMiddleware = async (ctx, next) => {
             .insert({ title, content })
             .returning("*")
         success(ctx, post)
+        return next()
     } catch (err) {
         // console.error(err)
         error(ctx, err, "Error querying for post")
     }
 }
 
-export const put: IMiddleware = async (ctx, next) => {
+export const put: Middleware = async (ctx, next) => {
     try {
         const { title, content } = ctx.request.body
         const id = ctx.params.id
@@ -62,12 +65,13 @@ export const put: IMiddleware = async (ctx, next) => {
             throw new ErrorWithStatus(`Post with id ${id} doesn't exist.`, 404)
         }
         success(ctx, updatedPost)
+        return next()
     } catch (err) {
         error(ctx, err, "Error with updating post")
     }
 }
 
-export const del: IMiddleware = async (ctx, next) => {
+export const del: Middleware = async (ctx, next) => {
     try {
         const id = ctx.params.id
         const post = await Post.query()
@@ -79,6 +83,7 @@ export const del: IMiddleware = async (ctx, next) => {
         if(!post) throw new ErrorWithStatus(`Post with id ${id} doesn't exist.`, 404)
 
         success(ctx, post)
+        return next()
     } catch (err) {
         error(ctx, err, "Error deleting post")
     }

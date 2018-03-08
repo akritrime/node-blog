@@ -7,7 +7,7 @@ import { getCtx
 
 import { Model } from 'objection'
 import { Post } from '../../db/models/post'
-import { dbConf } from '../../../test/utils/index';
+import { dbConf } from '../../db/utils';
 
 const { knexInit
       , knexDestroy

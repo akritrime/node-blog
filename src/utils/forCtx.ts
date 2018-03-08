@@ -13,6 +13,7 @@ export const error = (ctx: Context, err: any = {}, msg?: string) => {
         status: "error"
         , data: err.message || msg || "Internal server error."
     }
+    throw err
 }
 
 export class ErrorWithStatus extends Error {
